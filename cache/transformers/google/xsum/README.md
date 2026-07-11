@@ -1,40 +1,35 @@
 ---
-
 language: en
 tags:
-
-* summarization
-  model-index:
-* name: google/pegasus-xsum
-  results:
-
-  * task:
-    type: summarization
-    name: Summarization
-    dataset:
-    name: xsum
-    type: xsum
-    config: default
-    split: test
-    metrics:
-
-    * name: ROUGE-1
-      type: rouge
-      value: 46.8623
-      verified: true
-    * name: ROUGE-2
-      type: rouge
-      value: 24.4533
-      verified: true
-    * name: ROUGE-L
-      type: rouge
-      value: 39.0548
-      verified: true
-    * name: ROUGE-LSUM
-      type: rouge
-      value: 39.0994
-      verified: true
-
+  - summarization
+model-index:
+  - name: google/pegasus-xsum
+    results:
+      - task:
+          type: summarization
+          name: Summarization
+        dataset:
+          name: xsum
+          type: xsum
+          config: default
+          split: test
+        metrics:
+          - name: ROUGE-1
+            type: rouge
+            value: 46.8623
+            verified: true
+          - name: ROUGE-2
+            type: rouge
+            value: 24.4533
+            verified: true
+          - name: ROUGE-L
+            type: rouge
+            value: 39.0548
+            verified: true
+          - name: ROUGE-LSUM
+            type: rouge
+            value: 39.0994
+            verified: true
 ---
 
 # PEGASUS-XSum
@@ -49,11 +44,11 @@ The XSum checkpoint is intended for short, direct summaries and is suitable for 
 
 The Hugging Face model card reports the following verified results on the XSum test set:
 
-| Metric     | Score |
-| ---------- | ----: |
-| ROUGE-1    | 46.86 |
-| ROUGE-2    | 24.45 |
-| ROUGE-L    | 39.05 |
+| Metric | Score |
+|---|---:|
+| ROUGE-1 | 46.86 |
+| ROUGE-2 | 24.45 |
+| ROUGE-L | 39.05 |
 | ROUGE-LSUM | 39.10 |
 
 These are the reported results of the pretrained model and were not produced by this project.
@@ -66,8 +61,8 @@ The model and tokenizer are downloaded automatically through Hugging Face Transf
 
 ## References
 
-* [PEGASUS documentation](https://huggingface.co/docs/transformers/model_doc/pegasus)
-* [Original PEGASUS implementation](https://github.com/google-research/pegasus)
+- [PEGASUS documentation](https://huggingface.co/docs/transformers/model_doc/pegasus)
+- [Original PEGASUS implementation](https://github.com/google-research/pegasus)
 
 ```bibtex
 @misc{zhang2019pegasus,
@@ -78,6 +73,3 @@ The model and tokenizer are downloaded automatically through Hugging Face Transf
     archivePrefix={arXiv},
     primaryClass={cs.CL}
 }
-```
-
-::: 
