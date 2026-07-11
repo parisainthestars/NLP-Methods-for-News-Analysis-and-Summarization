@@ -194,25 +194,6 @@ An alternative runner is also available:
 python run.py
 ```
 
-## Project Structure
-
-```text
-NewsNLP/
-├── src/
-│   ├── core/
-│   │   ├── content_extractor.py
-│   │   ├── graph_summarizer.py
-│   │   ├── news_crawler.py
-│   │   ├── summarizer.py
-│   │   └── topic_classifier.py
-│   ├── pipeline.py
-│   └── utils/
-├── dataset/
-├── output/
-├── main.py
-├── run.py
-└── requirements.txt
-```
 
 ## What I Learned
 
