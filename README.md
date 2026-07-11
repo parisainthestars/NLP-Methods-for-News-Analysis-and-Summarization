@@ -1,10 +1,10 @@
 # NLP-Based News Understanding: Summarization, Classification, and Text Analysis
 
-This project was developed as a course project for Data Science. The main goal was to apply natural language processing methods to a collection of English news articles and turn unstructured text into useful and structured information.
+This project was developed as a course project for Data Science. Its main goal is to apply natural language processing methods to a collection of English news articles and convert unstructured text into information that can be summarized, classified, searched, and analyzed.
 
-The project follows a simple pipeline: news articles are collected from online sources, cleaned, analyzed with NLP models, and then organized for further data analysis. The main NLP tasks are abstractive and extractive summarization, topic classification, named entity recognition, part-of-speech tagging, and dependency parsing.
+The project follows a simple pipeline: articles are collected from online news sources, cleaned, processed with pretrained NLP models, and stored in a structured dataset. The main tasks are abstractive and extractive summarization, topic classification, named entity recognition, part-of-speech tagging, and dependency parsing.
 
-Pretrained models are used throughout the project. This keeps the implementation practical and makes it possible to study how NLP models behave on real news data without training a large language model from the beginning.
+Using pretrained models keeps the project practical. Instead of training a large language model from the beginning, the focus is on understanding the NLP pipeline, comparing different text-processing methods, and analyzing their outputs with common data science tools.
 
 ## Project Pipeline
 
@@ -13,17 +13,17 @@ flowchart LR
     A[NewsAPI and RSS Feeds] --> B[Article Collection]
     B --> C[Text Cleaning and Preprocessing]
 
-    C --> D[PEGASUS Summarization]
-    C --> E[T5 Topic Classification]
-    C --> F[spaCy Linguistic Analysis]
-    C --> G[Graph-Based Summarization]
+    C --> D[PEGASUS Abstractive Summarization]
+    C --> E[Graph-Based Extractive Summarization]
+    C --> F[T5 Topic Classification]
+    C --> G[spaCy Linguistic Analysis]
 
     D --> H[Structured News Dataset]
     E --> H
     F --> H
     G --> H
 
-    H --> I[Statistical Analysis]
+    H --> I[Data Analysis and Visualization]
     H --> J[Filtering and Retrieval]
 ```
 
@@ -31,41 +31,58 @@ flowchart LR
 
 ### Text Collection and Preprocessing
 
-News articles are collected from NewsAPI and RSS feeds. Since online articles may contain HTML tags, missing sections, repeated spaces, or unrelated page content, the text needs to be cleaned before it is passed to the NLP models.
+News articles are collected from NewsAPI and RSS feeds. Since online articles may include HTML tags, incomplete text, repeated spaces, or unrelated page content, the text is cleaned before it is passed to the NLP models.
 
 The preprocessing stage includes:
 
 * extracting the main article text
 * removing unnecessary characters and repeated spaces
-* splitting the text into sentences
+* splitting articles into sentences
 * tokenizing sentences into words
 * preparing titles and article bodies for the models
 
-NLTK and spaCy are used for these basic operations. This step is important because noisy input can reduce the quality of both classification and summarization.
+NLTK and spaCy are used for these operations. Preprocessing is an important part of the pipeline because noisy input can directly affect summarization, classification, and linguistic analysis.
 
-### Abstractive Summarization
+### Abstractive Summarization with PEGASUS
 
-The project uses `google/pegasus-xsum` for abstractive summarization.
+The project uses `google/pegasus-xsum` to generate short summaries of news articles.
 
-Abstractive summarization does not simply select sentences from the article. Instead, the model reads the input text and generates a new and shorter version of it. PEGASUS is an encoder-decoder Transformer model designed for this task.
+PEGASUS is an encoder-decoder Transformer designed for abstractive summarization. Unlike extractive methods, it does not only copy sentences from the article. The encoder first builds contextual representations of the input, and the decoder generates a new summary one token at a time.
 
-The encoder converts the article into contextual representations. The decoder then generates the summary one token at a time. The XSum checkpoint is used because it is trained to produce short and direct summaries of news articles.
+A main idea behind PEGASUS pretraining is **gap-sentence generation**. Important sentences are removed from a document, and the model learns to reconstruct them using the remaining text. This makes the pretraining task close to document summarization.
 
-In this project, the pretrained model is used for inference only. The article text is tokenized, passed to PEGASUS, and decoded into a readable summary. The implementation is located in `summarizer.py`.
+The PEGASUS model family was pretrained on large text collections such as C4 and HugeNews. Some checkpoints also use different gap-sentence ratios and stochastic selection of important sentences to make pretraining less dependent on one fixed masking pattern.
+
+The XSum checkpoint is used here because it is designed for short, direct summaries of news articles. In this project, the pretrained model is used only for inference: the article is tokenized, passed through the model, and decoded into a readable summary.
+
+For reference, the PEGASUS-XSum model card reports the following results on the XSum test set:
+
+| Metric  | Reported Score |
+| ------- | -------------: |
+| ROUGE-1 |          46.86 |
+| ROUGE-2 |          24.45 |
+| ROUGE-L |          39.05 |
+
+These are reported benchmark results for the pretrained model, not results produced by this project.
+
+The implementation is located in `summarizer.py`.
 
 ### Extractive Summarization
 
-The project also includes a graph-based summarization method.
+The project also includes a graph-based extractive summarization method.
 
-In this approach, each sentence is treated as a node in a graph. Similar sentences are connected, and more central sentences receive higher importance scores. The final summary is created by selecting the most important sentences from the original article.
+Each sentence is represented as a node in a graph. Similar sentences are connected, and central sentences receive larger importance scores. The final summary is formed by selecting the highest-ranked sentences from the original article.
 
-This method is extractive because it keeps the original sentences. It provides a useful comparison with PEGASUS, which generates new text.
+This gives a useful comparison between two types of summarization:
+
+* **Abstractive summarization:** generates new text
+* **Extractive summarization:** selects sentences from the source article
 
 The graph-based method is implemented with NetworkX in `graph_summarizer.py`.
 
 ### Topic Classification
 
-A T5 model fine-tuned for news-title classification is used to assign each article to one of eight categories:
+A T5 model fine-tuned for news-title classification assigns each article to one of eight categories:
 
 * Business
 * Entertainment
@@ -76,17 +93,15 @@ A T5 model fine-tuned for news-title classification is used to assign each artic
 * Sports
 * World
 
-T5 treats NLP tasks as text-to-text problems. The input is the article title or news text, and the model generates the corresponding category label.
+T5 treats NLP tasks as text-to-text problems. The input is a title or news article, and the generated output is the category label.
 
-This task turns unstructured text into structured labels. These labels are later useful for grouping articles, comparing categories, and studying topic distributions.
+This stage converts unstructured text into structured labels. The labels can then be used to group articles, compare sources, and study the distribution of news topics.
 
-The classification stage is implemented in `topic_classifier.py`.
+The implementation is located in `topic_classifier.py`.
 
 ### Named Entity Recognition
 
-The spaCy `en_core_web_sm` model is used to detect named entities in the articles.
-
-Named Entity Recognition identifies important expressions such as:
+The spaCy `en_core_web_sm` model is used to detect named entities such as:
 
 * people
 * organizations
@@ -95,50 +110,49 @@ Named Entity Recognition identifies important expressions such as:
 * events
 * monetary values
 
-The extracted entities can be used to study which people, places, and organizations appear most frequently in the collected news.
+Named entities help describe the main subjects of an article. After extraction, they can also be counted and compared across topics, sources, or time periods.
 
 ### Part-of-Speech Tagging
 
 Part-of-speech tagging assigns a grammatical label to each token, such as noun, verb, adjective, or adverb.
 
-This information helps describe the linguistic structure of the articles. It can also support later tasks such as keyword extraction, noun-phrase analysis, and rule-based filtering.
+These labels provide a basic description of the linguistic structure of the articles. They can also support keyword extraction, noun-phrase analysis, and simple rule-based filtering.
 
 ### Dependency Parsing
 
-Dependency parsing identifies grammatical relationships between words in a sentence.
+Dependency parsing finds grammatical relationships between words in a sentence.
 
-For example, it can show which noun is the subject of a verb or which word modifies another word. This provides more detail than simple tokenization and can be useful for analyzing sentence structure.
+For example, it can identify the subject of a verb or determine which word modifies another word. This gives more structural information than tokenization alone and helps analyze how information is expressed in news sentences.
 
 ## Data Science Part
 
-The results of the NLP pipeline are stored as structured data using Pandas and NumPy. Each article can include fields such as:
+The outputs of the NLP pipeline are stored as structured data using Pandas and NumPy. Each article can include fields such as:
 
-* title
-* source
+* title and source
 * publication date
-* topic
-* generated summary
-* extracted entities
-* article length
-* linguistic features
+* predicted topic
+* abstractive and extractive summaries
+* extracted named entities
+* article and summary lengths
+* basic linguistic features
 
-This makes it possible to analyze the news collection as a dataset rather than only processing one article at a time.
+This makes it possible to analyze the complete news collection as a dataset rather than processing each article separately.
 
-The data science part of the project includes:
+The data science part includes:
 
-* counting articles in each topic
-* comparing different news sources
+* comparing the number of articles in each category
 * analyzing article and summary lengths
 * studying common words and named entities
+* comparing different news sources
 * examining changes in topics over time
 * creating word clouds, heatmaps, and statistical plots
-* checking incorrect or uncertain classification results
+* reviewing incorrect or uncertain classification results
 
-The purpose of this stage is to understand the patterns in the data and also evaluate how the NLP methods behave on different types of articles.
+The purpose is both to find patterns in the news data and to understand how the NLP methods behave on different articles.
 
 ## Information Retrieval Part
 
-The information retrieval part is simple and supports the main NLP workflow.
+The information retrieval stage supports the main NLP workflow.
 
 Articles are retrieved from NewsAPI and RSS feeds and can be filtered by:
 
@@ -147,9 +161,9 @@ Articles are retrieved from NewsAPI and RSS feeds and can be filtered by:
 * source
 * publication date
 
-The retrieved articles are then passed to the NLP pipeline for summarization and analysis.
+The selected documents are then passed to the summarization, classification, and linguistic-analysis components.
 
-This project is not designed as a complete search engine. The retrieval stage is mainly used to collect and organize relevant news documents before applying NLP and data science methods.
+This project is not intended to be a complete search engine. Retrieval is mainly used to collect and organize relevant documents before applying NLP and data analysis.
 
 ## Main Tools
 
@@ -194,10 +208,9 @@ An alternative runner is also available:
 python run.py
 ```
 
-
 ## What I Learned
 
-This project helped me understand how several NLP tasks can be connected in one practical pipeline. I worked with text preprocessing, Transformer-based summarization, topic classification, named entity recognition, linguistic analysis, and extractive summarization.
+This project helped me understand how several NLP tasks can be connected in one practical pipeline. I worked with text preprocessing, Transformer-based summarization, graph-based summarization, topic classification, named entity recognition, and linguistic analysis.
 
-It also showed me how NLP outputs can be treated as data. After converting articles into summaries, labels, entities, and numerical features, they can be analyzed with standard data science methods to find patterns and evaluate the system.
+It also showed me how NLP outputs can be converted into structured data. Once articles are represented through summaries, labels, entities, and numerical features, standard data science methods can be used to find patterns and evaluate the behavior of the system.
 ::: 
