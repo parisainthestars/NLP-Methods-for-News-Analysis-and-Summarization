@@ -1,0 +1,21 @@
+beautifulsoup4==4.13.4
+feedparser==6.0.11
+lxml==6.0.0
+lxml_html_clean==0.4.2
+newsapi-python==0.2.7
+newspaper3k==0.2.8
+nltk==3.9.1
+numpy==2.3.2
+pandas==2.3.1
+networkx==3.5
+plotly==6.2.0
+python-dotenv==1.1.1
+requests==2.32.4
+scikit-learn==1.7.1
+scipy==1.16.1
+sentencepiece==0.2.0
+spacy==3.8.7
+en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl#sha256=1932429db727d4bff3deed6b34cfc05df17794f4a52eeb26cf8928f7c1a0fb85
+torch==2.7.1
+tqdm==4.67.1
+transformers==4.54.1
